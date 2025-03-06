@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Microzine</title>
+    <link rel="shortcut icon" href="./assets/favicon.png?v=1" />
+    <link rel="stylesheet" href="style.css?v=1" />
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="script.js" type="module"></script>
+  </head>
+  <body>
+    <header>
+      <h1>MICRO&#8203;ZINE</h1>
+      <h2>Una app para armar mini fanzines con una sola hoja A4.</h2>
+    </header>
+    <div id="uploadBox">
+      <p>Arrastrá y soltá acá</p>
+      <button id="uploadButton">Explorar</button>
+      <label
+        ><input
+          class="file-input"
+          id="fileInput"
+          type="file"
+          accept="image/*"
+          multiple
+          style="display: none"
+      /></label>
+    </div>
+    <div id="pagesContainer">
+      <div class="slot" id="slot-0"></div>
+      <div class="slot" id="slot-1"></div>
+      <div class="slot" id="slot-2"></div>
+      <div class="slot" id="slot-3"></div>
+      <div class="slot" id="slot-4"></div>
+      <div class="slot" id="slot-5"></div>
+      <div class="slot" id="slot-6"></div>
+      <div class="slot" id="slot-7"></div>
+    </div>
+    <button id="renderButton">render</button>
+    <footer>
+      <p>
+        El código fuente de esta página web se encuentra bajo la licencia
+        <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank"
+          >GNU General Public License v3.0 (GPLv3)</a
+        >. Por otro lado, las ilustraciones y obras visuales presentes son propiedad
+        de sus autores originales y no están incluidas en los términos de la licencia
+        GPLv3.
+      </p>
+      <!-- <a
+        class="cafecito"
+        href="https://cafecito.app/birman"
+        rel="noopener"
+        target="_blank"
+        ><img
+          srcset="
+            https://cdn.cafecito.app/imgs/buttons/button_3.png       1x,
+            https://cdn.cafecito.app/imgs/buttons/button_3_2x.png    2x,
+            https://cdn.cafecito.app/imgs/buttons/button_3_3.75x.png 3.75x
+          "
+          src="https://cdn.cafecito.app/imgs/buttons/button_3.png"
+          alt="Invitame un café en cafecito.app"
+      /></a> -->
+    </footer>
+  </body>
+</html>
