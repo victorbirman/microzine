@@ -1,16 +1,16 @@
 //==========initialize variables and DOM elements
 
 const MAX_PAGES = 8
-const DPI = 300
-const DPC = DPI / 2.54
+const DPI = 150
+const CANVAS_DIMENSION = { width: 2.91, height: 4.13 } // A7 page in inches
 const pages = []
 const elements = {}
 let pagesOrder = [0, 1, 2, 3, 4, 5, 6, 7]
 
 const boundingBox = true
-const boundingBoxColor = "#34561f"
+const boundingBoxColor = "#d3d3d3"
 const boundingBoxWidth = 1 //in pixels
-const boundingBoxLineStyle = "solid" // Options: "solid", "dashed", "dotted"
+const boundingBoxLineStyle = "dashed" // Options: "solid", "dashed", "dotted"
 ;[
   "uploadBox",
   "uploadButton",
@@ -41,7 +41,7 @@ uploadBox.addEventListener("dragleave", () => uploadBox.classList.remove("dragov
 
 renderButton.addEventListener("click", async () => {
   try {
-    const { render } = await import("./render.js")
+    const { render } = await import("./renderVertical.js")
     render(pages, pagesOrder)
   } catch (error) {
     console.error("Error importing or calling render:", error)
@@ -102,7 +102,10 @@ class Page {
 
     this.id = Page.id
 
-    const aspectRatio = Math.max(this.image.width / 210, this.image.height / 297)
+    const aspectRatio = Math.max(
+      this.image.width / (CANVAS_DIMENSION.width * DPI),
+      this.image.height / (CANVAS_DIMENSION.height * DPI)
+    )
     this.initialWidth = this.image.width / aspectRatio
     this.initialHeight = this.image.height / aspectRatio
 
@@ -125,8 +128,8 @@ class Page {
     this.canvas = document.createElement("canvas")
     this.canvas.className = "canvas"
     this.canvas.id = `canvas-${this.id}`
-    this.canvas.width = 210
-    this.canvas.height = 297
+    this.canvas.width = Math.round(CANVAS_DIMENSION.width * DPI)
+    this.canvas.height = Math.round(CANVAS_DIMENSION.height * DPI)
   }
 
   createSliders() {
