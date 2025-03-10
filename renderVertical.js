@@ -25,6 +25,8 @@ export function render(pages, finalOrder) {
   outputCanvas.height = referenceCanvas.width * 4
 
   const ctx = outputCanvas.getContext("2d")
+  ctx.imageSmoothingEnabled = true // Enable smoothing
+  ctx.imageSmoothingQuality = "high" // Set quality level
   ctx.fillStyle = "white"
   ctx.fillRect(0, 0, outputCanvas.width, outputCanvas.height)
 

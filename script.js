@@ -21,23 +21,29 @@ const elements = {}
 
 //==========event listeners for upload-box
 
-uploadButton.addEventListener("click", () => fileInput.click())
-fileInput.addEventListener("change", e => {
+elements.uploadButton.addEventListener("click", () => elements.fileInput.click())
+
+elements.fileInput.addEventListener("change", e => {
   importImages(e.target.files)
   e.target.value = ""
 })
-uploadBox.addEventListener("drop", e => {
+
+elements.uploadBox.addEventListener("drop", e => {
   e.preventDefault()
-  uploadBox.classList.remove("dragover")
+  elements.uploadBox.classList.remove("dragover")
   importImages(e.dataTransfer.files)
 })
-uploadBox.addEventListener("dragover", el => {
-  el.preventDefault()
-  uploadBox.classList.add("dragover")
-})
-uploadBox.addEventListener("dragleave", () => uploadBox.classList.remove("dragover"))
 
-renderButton.addEventListener("click", async () => {
+elements.uploadBox.addEventListener("dragover", e => {
+  e.preventDefault()
+  elements.uploadBox.classList.add("dragover")
+})
+
+elements.uploadBox.addEventListener("dragleave", () =>
+  elements.uploadBox.classList.remove("dragover")
+)
+
+elements.renderButton.addEventListener("click", async () => {
   try {
     const { render } = await import("./renderVertical.js")
     render(zine.slotsList, pagesOrder)
@@ -69,6 +75,18 @@ class Page {
 
     this.container.appendChild(this.canvas)
     this.container.appendChild(this.toolsContainer)
+
+    this.rotationListener = () => {
+      this.rotation = parseInt(this.rotationSlider.value, 10)
+      this.drawImage()
+    }
+
+    this.scaleListener = () => {
+      this.scale = parseInt(this.scaleSlider.value, 10) / 100
+      this.drawImage()
+    }
+
+    this.deleteListener = () => this.removePage()
 
     this.setupEventListeners()
 
@@ -133,22 +151,17 @@ class Page {
   }
 
   setupEventListeners() {
-    this.rotationSlider.addEventListener("input", () => {
-      this.rotation = parseInt(this.rotationSlider.value, 10)
-      this.drawImage()
-    })
-
-    this.scaleSlider.addEventListener("input", () => {
-      this.scale = parseInt(this.scaleSlider.value, 10) / 100
-      this.drawImage()
-    })
-
-    this.deleteBtn.addEventListener("click", () => this.removePage())
+    this.rotationSlider.addEventListener("input", this.rotationListener)
+    this.scaleSlider.addEventListener("input", this.scaleListener)
+    this.deleteBtn.addEventListener("click", this.deleteListener)
   }
 
   drawImage() {
     const ctx = this.canvas.getContext("2d")
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
+    ctx.imageSmoothingEnabled = true // Enable smoothing
+    ctx.imageSmoothingQuality = "high" // Set quality level
 
     const scaledWidth = this.initialWidth * this.scale
     const scaledHeight = this.initialHeight * this.scale
@@ -166,6 +179,8 @@ class Page {
     ctx.restore()
 
     if (boundingBox) {
+      ctx.save()
+
       ctx.strokeStyle = boundingBoxColor
       ctx.lineWidth = boundingBoxWidth
 
@@ -180,13 +195,16 @@ class Page {
           ctx.setLineDash([]) // Solid line (no dashes)
           break
       }
-
       ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height)
 
-      ctx.setLineDash([])
+      ctx.restore()
     }
   }
   removePage() {
+    this.rotationSlider.removeEventListener("input", this.rotationListener)
+    this.scaleSlider.removeEventListener("input", this.scaleListener)
+    this.deleteBtn.removeEventListener("click", this.deleteListener)
+
     this.canvas.width = 0
     this.canvas.height = 0
     this.container.remove()
@@ -194,10 +212,6 @@ class Page {
     if (this.image.src.startsWith("blob:")) {
       URL.revokeObjectURL(this.image.src)
     }
-
-    this.rotationSlider.replaceWith(this.rotationSlider.cloneNode(true))
-    this.scaleSlider.replaceWith(this.scaleSlider.cloneNode(true))
-    this.deleteBtn.replaceWith(this.deleteBtn.cloneNode(true))
 
     zine.slotsList[this.id] = null
   }
