@@ -40,22 +40,18 @@ canvas {
   height: 297px;
   background-color: whitesmoke;
   border: 2px dashed var(--primary-color);
+  margin-bottom: 40px;
 }
 
 .render-button {
   margin-top: 30px;
 }
 
-#grid {
-  display: grid;
-  grid-template-columns: repeat(3, 300px);
-  gap: 10px;
-}
-
 #pagesContainer {
   display: grid;
-  grid-template-columns: repeat(3, 300px);
-  gap: 10px;
+  grid-template-columns: repeat(4, 300px);
+  gap: 30px;
+  margin-bottom: 60px;
 }
 
 .sortable-ghost {

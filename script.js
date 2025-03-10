@@ -3,14 +3,14 @@
 const MAX_PAGES = 8
 const DPI = 150
 const CANVAS_DIMENSION = { width: 2.91, height: 4.13 } // A7 page in inches
-const pages = []
-const elements = {}
 let pagesOrder = [0, 1, 2, 3, 4, 5, 6, 7]
 
 const boundingBox = true
 const boundingBoxColor = "#d3d3d3"
 const boundingBoxWidth = 1 //in pixels
 const boundingBoxLineStyle = "dashed" // Options: "solid", "dashed", "dotted"
+
+const elements = {}
 ;[
   "uploadBox",
   "uploadButton",
@@ -37,70 +37,22 @@ uploadBox.addEventListener("dragover", el => {
 })
 uploadBox.addEventListener("dragleave", () => uploadBox.classList.remove("dragover"))
 
-//==========render calls render module
-
 renderButton.addEventListener("click", async () => {
   try {
     const { render } = await import("./renderVertical.js")
-    render(pages, pagesOrder)
+    render(zine.slotsList, pagesOrder)
   } catch (error) {
     console.error("Error importing or calling render:", error)
   }
 })
 
-//==========initialize sortable library and refresh order of pages
-
-new Sortable(elements.pagesContainer, {
-  animation: 150,
-  ghostClass: "sortable-ghost",
-  chosenClass: "sortable-chosen",
-  dragClass: "sortable-drag",
-  handle: "canvas",
-  onEnd: function (evt) {
-    pagesOrder = Array.from(pagesContainer.children).map(item =>
-      parseInt(item.id.replace("slot-", ""))
-    )
-    console.log("Full order of items:", pagesOrder)
-  },
-})
-
-//==========uploaded images call page creation and are attached to container
-
-function importImages(files) {
-  const remainingSlots = MAX_PAGES - pages.filter(x => x !== null).length
-  const filesToAdd = Array.from(files)
-    .filter(file => file.type.startsWith("image/"))
-    .slice(0, remainingSlots)
-
-  filesToAdd.forEach(file => {
-    const img = new Image()
-    const objectURL = URL.createObjectURL(file)
-    img.src = objectURL
-
-    img.onload = function () {
-      const page = new Page(img)
-      pages[page.id] = page
-      document.getElementById(`slot-${page.id}`).appendChild(page.container)
-      URL.revokeObjectURL(objectURL)
-    }
-    img.onerror = function () {
-      console.error("Failed to load image")
-      URL.revokeObjectURL(objectURL)
-    }
-  })
-}
-
-//==========page includes canvas and sliders, methods for drawing an manipulation
-
+//============classes
 class Page {
-  static id = 0
-
-  constructor(image) {
+  constructor(image, id) {
+    this.id = id
     this.image = image
     this.scale = 1
     this.rotation = 0
-
-    this.id = Page.id
 
     const aspectRatio = Math.max(
       this.image.width / (CANVAS_DIMENSION.width * DPI),
@@ -113,15 +65,14 @@ class Page {
     this.container.id = `page-container-${this.id}`
 
     this.createCanvas()
-    this.createSliders()
+    this.createToolbox()
 
     this.container.appendChild(this.canvas)
-    this.container.appendChild(this.sliderContainer)
+    this.container.appendChild(this.toolsContainer)
 
     this.setupEventListeners()
 
     this.drawImage()
-    Page.id++
   }
 
   createCanvas() {
@@ -132,9 +83,13 @@ class Page {
     this.canvas.height = Math.round(CANVAS_DIMENSION.height * DPI)
   }
 
-  createSliders() {
-    this.sliderContainer = document.createElement("div")
-    this.sliderContainer.className = "slider-container"
+  createToolbox() {
+    this.toolsContainer = document.createElement("div")
+    this.toolsContainer.className = "tools-container"
+
+    this.deleteBtn = document.createElement("button")
+    this.toolsContainer.appendChild(this.deleteBtn)
+    this.deleteBtn.textContent = "🗑️"
 
     const sliders = [
       {
@@ -169,8 +124,8 @@ class Page {
       slider.value = value
       slider.step = step
 
-      this.sliderContainer.appendChild(sliderLabel)
-      this.sliderContainer.appendChild(slider)
+      this.toolsContainer.appendChild(sliderLabel)
+      this.toolsContainer.appendChild(slider)
 
       if (label === "Rotation") this.rotationSlider = slider
       if (label === "Scale (%)") this.scaleSlider = slider
@@ -187,6 +142,8 @@ class Page {
       this.scale = parseInt(this.scaleSlider.value, 10) / 100
       this.drawImage()
     })
+
+    this.deleteBtn.addEventListener("click", () => this.removePage())
   }
 
   drawImage() {
@@ -208,12 +165,10 @@ class Page {
     )
     ctx.restore()
 
-    // Draw the bounding box if enabled
     if (boundingBox) {
       ctx.strokeStyle = boundingBoxColor
       ctx.lineWidth = boundingBoxWidth
 
-      // Set line style based on boundingBoxLineStyle
       switch (boundingBoxLineStyle) {
         case "dashed":
           ctx.setLineDash([10, 5]) // Dash pattern: 10px drawn, 5px gap
@@ -226,11 +181,84 @@ class Page {
           break
       }
 
-      // Draw the bounding box
       ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height)
 
-      // Reset the line dash to avoid affecting other drawings
       ctx.setLineDash([])
     }
   }
+  removePage() {
+    this.canvas.width = 0
+    this.canvas.height = 0
+    this.container.remove()
+
+    if (this.image.src.startsWith("blob:")) {
+      URL.revokeObjectURL(this.image.src)
+    }
+
+    this.rotationSlider.replaceWith(this.rotationSlider.cloneNode(true))
+    this.scaleSlider.replaceWith(this.scaleSlider.cloneNode(true))
+    this.deleteBtn.replaceWith(this.deleteBtn.cloneNode(true))
+
+    zine.slotsList[this.id] = null
+  }
+}
+
+class SlotList {
+  constructor(numberOfPages) {
+    this.slotsList = new Array(numberOfPages).fill(null)
+  }
+  get length() {
+    return this.slotsList.length
+  }
+  get emptySlotsCount() {
+    return this.slotsList.filter(slot => slot == null).length
+  }
+  get nextEmptySlot() {
+    return this.slotsList.findIndex(x => x == null)
+  }
+}
+
+new Sortable(elements.pagesContainer, {
+  animation: 150,
+  ghostClass: "sortable-ghost",
+  chosenClass: "sortable-chosen",
+  dragClass: "sortable-drag",
+  handle: "canvas",
+  onEnd: function () {
+    pagesOrder = Array.from(pagesContainer.children).map(item =>
+      parseInt(item.id.replace("slot-", ""))
+    )
+  },
+})
+
+let zine = new SlotList(MAX_PAGES)
+function importImages(files) {
+  if (zine.emptySlotsCount <= 0) {
+    fullSlotsWarning()
+    return
+  }
+  const filesToAdd = Array.from(files)
+    .filter(file => file.type.startsWith("image/"))
+    .slice(0, zine.emptySlotsCount)
+
+  filesToAdd.forEach(file => {
+    const img = new Image()
+    const objectURL = URL.createObjectURL(file)
+    img.src = objectURL
+
+    img.onload = function () {
+      const page = new Page(img, zine.nextEmptySlot)
+      zine.slotsList[page.id] = page
+      document.getElementById(`slot-${page.id}`).appendChild(page.container)
+      URL.revokeObjectURL(objectURL)
+    }
+    img.onerror = function () {
+      console.error("Failed to load image")
+      URL.revokeObjectURL(objectURL)
+    }
+  })
+}
+
+function fullSlotsWarning() {
+  console.log("llegaste al límite de imágenes")
 }

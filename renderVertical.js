@@ -26,16 +26,6 @@ export function render(pages, finalOrder) {
 
   const ctx = outputCanvas.getContext("2d")
   ctx.fillStyle = "white"
-  console.log(
-    "pagew",
-    pageWidth,
-    "pageh",
-    pageHeight,
-    "canW",
-    outputCanvas.width,
-    "canH",
-    outputCanvas.height
-  )
   ctx.fillRect(0, 0, outputCanvas.width, outputCanvas.height)
 
   let rowPosition = 0
