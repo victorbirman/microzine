@@ -26,12 +26,12 @@ canvas {
   width: 210px;
   height: 297px;
 }
-#uploadBox {
+#dropArea {
   border: 4px solid var(--primary-color);
   margin: 1em;
 }
 
-.upload-box.dragover {
+#dropArea.dragover {
   background-color: hsl(66, 28%, 70%);
 }
 
@@ -56,4 +56,8 @@ canvas {
 
 .sortable-ghost {
   opacity: 0;
+}
+
+#reorderBtn {
+  color: blue;
 }

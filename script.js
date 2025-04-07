@@ -1,222 +1,21 @@
-//==========initialize variables and DOM elements
+import { Page } from "./Page.js"
 
-const MAX_PAGES = 8
-const DPI = 150
-const CANVAS_DIMENSION = { width: 2.91, height: 4.13 } // A7 page in inches
-let pagesOrder = [0, 1, 2, 3, 4, 5, 6, 7]
-
-const boundingBox = true
-const boundingBoxColor = "#d3d3d3"
-const boundingBoxWidth = 1 //in pixels
-const boundingBoxLineStyle = "dashed" // Options: "solid", "dashed", "dotted"
-
-const elements = {}
-;[
-  "uploadBox",
-  "uploadButton",
-  "fileInput",
-  "pagesContainer",
-  "renderButton",
-].forEach(id => (elements[id] = document.getElementById(id)))
-
-//==========event listeners for upload-box
-
-elements.uploadButton.addEventListener("click", () => elements.fileInput.click())
-
-elements.fileInput.addEventListener("change", e => {
-  importImages(e.target.files)
-  e.target.value = ""
-})
-
-elements.uploadBox.addEventListener("drop", e => {
-  e.preventDefault()
-  elements.uploadBox.classList.remove("dragover")
-  importImages(e.dataTransfer.files)
-})
-
-elements.uploadBox.addEventListener("dragover", e => {
-  e.preventDefault()
-  elements.uploadBox.classList.add("dragover")
-})
-
-elements.uploadBox.addEventListener("dragleave", () =>
-  elements.uploadBox.classList.remove("dragover")
-)
-
-elements.renderButton.addEventListener("click", async () => {
-  try {
-    const { render } = await import("./renderVertical.js")
-    render(zine.slotsList, pagesOrder)
-  } catch (error) {
-    console.error("Error importing or calling render:", error)
-  }
-})
-
-//============classes
-class Page {
-  constructor(image, id) {
-    this.id = id
-    this.image = image
-    this.scale = 1
-    this.rotation = 0
-
-    const aspectRatio = Math.max(
-      this.image.width / (CANVAS_DIMENSION.width * DPI),
-      this.image.height / (CANVAS_DIMENSION.height * DPI)
-    )
-    this.initialWidth = this.image.width / aspectRatio
-    this.initialHeight = this.image.height / aspectRatio
-
-    this.container = document.createElement("div")
-    this.container.id = `page-container-${this.id}`
-
-    this.createCanvas()
-    this.createToolbox()
-
-    this.container.appendChild(this.canvas)
-    this.container.appendChild(this.toolsContainer)
-
-    this.rotationListener = () => {
-      this.rotation = parseInt(this.rotationSlider.value, 10)
-      this.drawImage()
-    }
-
-    this.scaleListener = () => {
-      this.scale = parseInt(this.scaleSlider.value, 10) / 100
-      this.drawImage()
-    }
-
-    this.deleteListener = () => this.removePage()
-
-    this.setupEventListeners()
-
-    this.drawImage()
-  }
-
-  createCanvas() {
-    this.canvas = document.createElement("canvas")
-    this.canvas.className = "canvas"
-    this.canvas.id = `canvas-${this.id}`
-    this.canvas.width = Math.round(CANVAS_DIMENSION.width * DPI)
-    this.canvas.height = Math.round(CANVAS_DIMENSION.height * DPI)
-  }
-
-  createToolbox() {
-    this.toolsContainer = document.createElement("div")
-    this.toolsContainer.className = "tools-container"
-
-    this.deleteBtn = document.createElement("button")
-    this.toolsContainer.appendChild(this.deleteBtn)
-    this.deleteBtn.textContent = "🗑️"
-
-    const sliders = [
-      {
-        label: "Rotation",
-        id: `rotation-slider-${this.id}`,
-        min: -180,
-        max: 180,
-        value: 0,
-        step: 1,
-      },
-      {
-        label: "Scale (%)",
-        id: `scale-slider-${this.id}`,
-        min: 1,
-        max: 200,
-        value: 100,
-        step: 1,
-      },
-    ]
-
-    sliders.forEach(({ label, id, min, max, value, step }) => {
-      const sliderLabel = document.createElement("label")
-      sliderLabel.setAttribute("for", id)
-      sliderLabel.textContent = `${label}:`
-
-      const slider = document.createElement("input")
-      slider.type = "range"
-      slider.id = id
-      slider.className = `${label.toLowerCase().split(" ")[0]}-slider`
-      slider.min = min
-      slider.max = max
-      slider.value = value
-      slider.step = step
-
-      this.toolsContainer.appendChild(sliderLabel)
-      this.toolsContainer.appendChild(slider)
-
-      if (label === "Rotation") this.rotationSlider = slider
-      if (label === "Scale (%)") this.scaleSlider = slider
-    })
-  }
-
-  setupEventListeners() {
-    this.rotationSlider.addEventListener("input", this.rotationListener)
-    this.scaleSlider.addEventListener("input", this.scaleListener)
-    this.deleteBtn.addEventListener("click", this.deleteListener)
-  }
-
-  drawImage() {
-    const ctx = this.canvas.getContext("2d")
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
-    ctx.imageSmoothingEnabled = true // Enable smoothing
-    ctx.imageSmoothingQuality = "high" // Set quality level
-
-    const scaledWidth = this.initialWidth * this.scale
-    const scaledHeight = this.initialHeight * this.scale
-
-    ctx.save()
-    ctx.translate(this.canvas.width / 2, this.canvas.height / 2)
-    ctx.rotate((this.rotation * Math.PI) / 180)
-    ctx.drawImage(
-      this.image,
-      -scaledWidth / 2,
-      -scaledHeight / 2,
-      scaledWidth,
-      scaledHeight
-    )
-    ctx.restore()
-
-    if (boundingBox) {
-      ctx.save()
-
-      ctx.strokeStyle = boundingBoxColor
-      ctx.lineWidth = boundingBoxWidth
-
-      switch (boundingBoxLineStyle) {
-        case "dashed":
-          ctx.setLineDash([10, 5]) // Dash pattern: 10px drawn, 5px gap
-          break
-        case "dotted":
-          ctx.setLineDash([2, 4]) // Dot pattern: 2px drawn, 4px gap
-          break
-        default:
-          ctx.setLineDash([]) // Solid line (no dashes)
-          break
-      }
-      ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height)
-
-      ctx.restore()
-    }
-  }
-  removePage() {
-    this.rotationSlider.removeEventListener("input", this.rotationListener)
-    this.scaleSlider.removeEventListener("input", this.scaleListener)
-    this.deleteBtn.removeEventListener("click", this.deleteListener)
-
-    this.canvas.width = 0
-    this.canvas.height = 0
-    this.container.remove()
-
-    if (this.image.src.startsWith("blob:")) {
-      URL.revokeObjectURL(this.image.src)
-    }
-
-    zine.slotsList[this.id] = null
-  }
+//==========Initialize Fanzine Layout
+const layout = {
+  maxPages: 8,
+  dpi: 150,
+  pageInches: { width: 2.91, height: 4.13 }, // A7 page
+  pagesOrder: [0, 1, 2, 3, 4, 5, 6, 7], // Sortable initialization
 }
 
+const foldingGuides = {
+  active: true,
+  color: "#d3d3d3",
+  width: 1, //in pixels
+  style: "dashed", // Options: "solid", "dashed", "dotted"
+}
+
+//=========== Initialize Slots
 class SlotList {
   constructor(numberOfPages) {
     this.slotsList = new Array(numberOfPages).fill(null)
@@ -231,21 +30,178 @@ class SlotList {
     return this.slotsList.findIndex(x => x == null)
   }
 }
+export let zine = new SlotList(layout.maxPages)
 
-new Sortable(elements.pagesContainer, {
+//========== Initialize Sortable
+let sortable = new Sortable(document.getElementById("pagesContainer"), {
   animation: 150,
   ghostClass: "sortable-ghost",
   chosenClass: "sortable-chosen",
   dragClass: "sortable-drag",
-  handle: "canvas",
   onEnd: function () {
-    pagesOrder = Array.from(pagesContainer.children).map(item =>
+    layout.pagesOrder = Array.from(pagesContainer.children).map(item =>
       parseInt(item.id.replace("slot-", ""))
     )
   },
 })
 
-let zine = new SlotList(MAX_PAGES)
+//========== Initialize Upload Area
+const dropArea = document.getElementById("dropArea")
+const uploadBtn = document.getElementById("uploadBtn")
+const fileInput = document.getElementById("fileInput")
+
+uploadBtn.addEventListener("click", () => {
+  fileInput.click()
+})
+
+fileInput.addEventListener("change", e => {
+  importImages(e.target.files)
+  e.target.value = "" // Clear input to allow same file re-upload
+})
+
+dropArea.addEventListener("drop", e => {
+  e.preventDefault()
+  dropArea.classList.remove("dragover")
+  importImages(e.dataTransfer.files)
+})
+
+dropArea.addEventListener("dragover", e => {
+  e.preventDefault()
+  dropArea.classList.add("dragover")
+})
+
+dropArea.addEventListener("dragleave", () => {
+  dropArea.classList.remove("dragover")
+})
+
+//======== Set Current Canvas on Mouseover
+let currentSlot = null
+let currentCanvas
+let slots = document.querySelectorAll(".slot")
+
+//======== Transform Tools Rendering and Status
+
+let toolStatus = "reorder"
+
+const statusMapping = {
+  reorderBtn: "reorder",
+  rotateBtn: "rotate",
+  scaleBtn: "scale",
+  moveBtn: "move",
+}
+
+const buttons = document.querySelectorAll(".controls button")
+
+function updateButtonStyles(activeBtnId) {
+  buttons.forEach(btn => {
+    if (btn.id === activeBtnId) {
+      btn.style.color = "blue"
+    } else {
+      btn.style.color = "black"
+    }
+  })
+}
+
+function activateButton(btnId) {
+  toolStatus = statusMapping[btnId]
+  updateButtonStyles(btnId)
+  sortable.options.disabled = true
+}
+
+function activateReorder() {
+  toolStatus = "reorder"
+  updateButtonStyles("reorderBtn")
+  sortable.options.disabled = false
+}
+
+buttons.forEach(btn => {
+  btn.addEventListener("click", function () {
+    const clickedStatus = statusMapping[btn.id]
+
+    if (clickedStatus === "reorder") {
+      activateReorder()
+      return
+    }
+    if (toolStatus === clickedStatus) {
+      activateReorder()
+      return
+    }
+    activateButton(btn.id)
+  })
+})
+
+//========= Active Canvas Status
+slots.forEach(slot =>
+  slot.addEventListener("mouseenter", e => {
+    // Only update current canvas if not dragging
+    if (!isDragging) {
+      currentSlot = e.target
+      currentCanvas = zine.slotsList[parseInt(currentSlot.id.replace("slot-", ""))]
+    }
+  })
+)
+
+slots.forEach(slot =>
+  slot.addEventListener("mouseleave", e => {
+    currentSlot = null
+  })
+)
+
+//====== Mouse Events For Transformation Tools
+
+let isDragging = false
+let lastX, lastY
+
+const rotationFactor = 0.5
+const scaleFactor = 0.01
+
+function handleMouseDown(e) {
+  if (toolStatus === "reorder" || !currentSlot || !currentCanvas) return
+  isDragging = true
+  lastX = e.clientX
+  lastY = e.clientY
+}
+
+function handleMouseMove(e) {
+  if (!isDragging || !currentCanvas) return
+
+  let deltaX = e.clientX - lastX
+  let deltaY = e.clientY - lastY
+
+  switch (toolStatus) {
+    case "rotate":
+      currentCanvas.rotateBy(deltaX * rotationFactor)
+      break
+    case "scale":
+      currentCanvas.scaleBy(deltaX * scaleFactor)
+      break
+    case "move":
+      currentCanvas.moveBy(deltaX, deltaY)
+      break
+  }
+
+  lastX = e.clientX
+  lastY = e.clientY
+}
+
+function handleMouseUp(e) {
+  isDragging = false
+}
+
+document.addEventListener("mousedown", handleMouseDown)
+document.addEventListener("mousemove", handleMouseMove)
+document.addEventListener("mouseup", handleMouseUp)
+
+//========= Render Button Calls Render
+document.getElementById("renderBtn").addEventListener("click", async () => {
+  try {
+    const { render } = await import("./render.js")
+    render(zine.slotsList, layout.pagesOrder, foldingGuides)
+  } catch (error) {
+    console.error("Error importing or calling render:", error)
+  }
+})
+
 function importImages(files) {
   if (zine.emptySlotsCount <= 0) {
     fullSlotsWarning()
@@ -261,7 +217,7 @@ function importImages(files) {
     img.src = objectURL
 
     img.onload = function () {
-      const page = new Page(img, zine.nextEmptySlot)
+      const page = new Page(img, zine.nextEmptySlot, layout)
       zine.slotsList[page.id] = page
       document.getElementById(`slot-${page.id}`).appendChild(page.container)
       URL.revokeObjectURL(objectURL)
@@ -274,5 +230,5 @@ function importImages(files) {
 }
 
 function fullSlotsWarning() {
-  console.log("llegaste al límite de imágenes")
+  console.log("llegaste al límite de imágenes") //may will add something useful here
 }

@@ -9,14 +9,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="script.js" type="module"></script>
   </head>
+
   <body>
     <header>
       <h1>MICRO&#8203;ZINE</h1>
       <h2>Una app para armar mini fanzines con una sola hoja A4.</h2>
     </header>
-    <div id="uploadBox">
+    <div id="dropArea">
       <p>Arrastrá y soltá acá</p>
-      <button id="uploadButton">Explorar</button>
+      <button id="uploadBtn">Explorar</button>
       <label
         ><input
           id="fileInput"
@@ -25,6 +26,12 @@
           multiple
           style="display: none"
       /></label>
+    </div>
+    <div class="controls">
+      <button id="reorderBtn">Reorder</button>
+      <button id="rotateBtn">Rotate</button>
+      <button id="scaleBtn">Scale</button>
+      <button id="moveBtn">Move</button>
     </div>
     <div id="pagesContainer">
       <div class="slot" id="slot-0"></div>
@@ -36,7 +43,7 @@
       <div class="slot" id="slot-6"></div>
       <div class="slot" id="slot-7"></div>
     </div>
-    <button id="renderButton">render</button>
+    <button id="renderBtn">render</button>
     <footer>
       <p>
         El código fuente de esta página web se encuentra bajo la licencia
