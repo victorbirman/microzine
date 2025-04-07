@@ -1,7 +1,8 @@
-import { Page } from "./Page.js"
+import { SlotList } from "./SlotList.js"
+import { sortable } from "./sortable.js"
+import initializeUploadArea from "./uploadArea.js"
 
-//==========Initialize Fanzine Layout
-const layout = {
+export const layout = {
   maxPages: 8,
   dpi: 150,
   pageInches: { width: 2.91, height: 4.13 }, // A7 page
@@ -15,64 +16,9 @@ const foldingGuides = {
   style: "dashed", // Options: "solid", "dashed", "dotted"
 }
 
-//=========== Initialize Slots
-class SlotList {
-  constructor(numberOfPages) {
-    this.slotsList = new Array(numberOfPages).fill(null)
-  }
-  get length() {
-    return this.slotsList.length
-  }
-  get emptySlotsCount() {
-    return this.slotsList.filter(slot => slot == null).length
-  }
-  get nextEmptySlot() {
-    return this.slotsList.findIndex(x => x == null)
-  }
-}
 export let zine = new SlotList(layout.maxPages)
 
-//========== Initialize Sortable
-let sortable = new Sortable(document.getElementById("pagesContainer"), {
-  animation: 150,
-  ghostClass: "sortable-ghost",
-  chosenClass: "sortable-chosen",
-  dragClass: "sortable-drag",
-  onEnd: function () {
-    layout.pagesOrder = Array.from(pagesContainer.children).map(item =>
-      parseInt(item.id.replace("slot-", ""))
-    )
-  },
-})
-
-//========== Initialize Upload Area
-const dropArea = document.getElementById("dropArea")
-const uploadBtn = document.getElementById("uploadBtn")
-const fileInput = document.getElementById("fileInput")
-
-uploadBtn.addEventListener("click", () => {
-  fileInput.click()
-})
-
-fileInput.addEventListener("change", e => {
-  importImages(e.target.files)
-  e.target.value = "" // Clear input to allow same file re-upload
-})
-
-dropArea.addEventListener("drop", e => {
-  e.preventDefault()
-  dropArea.classList.remove("dragover")
-  importImages(e.dataTransfer.files)
-})
-
-dropArea.addEventListener("dragover", e => {
-  e.preventDefault()
-  dropArea.classList.add("dragover")
-})
-
-dropArea.addEventListener("dragleave", () => {
-  dropArea.classList.remove("dragover")
-})
+initializeUploadArea()
 
 //======== Set Current Canvas on Mouseover
 let currentSlot = null
@@ -133,7 +79,6 @@ buttons.forEach(btn => {
 //========= Active Canvas Status
 slots.forEach(slot =>
   slot.addEventListener("mouseenter", e => {
-    // Only update current canvas if not dragging
     if (!isDragging) {
       currentSlot = e.target
       currentCanvas = zine.slotsList[parseInt(currentSlot.id.replace("slot-", ""))]
@@ -192,7 +137,7 @@ document.addEventListener("mousedown", handleMouseDown)
 document.addEventListener("mousemove", handleMouseMove)
 document.addEventListener("mouseup", handleMouseUp)
 
-//========= Render Button Calls Render
+//========= Render Button
 document.getElementById("renderBtn").addEventListener("click", async () => {
   try {
     const { render } = await import("./render.js")
@@ -201,34 +146,3 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
     console.error("Error importing or calling render:", error)
   }
 })
-
-function importImages(files) {
-  if (zine.emptySlotsCount <= 0) {
-    fullSlotsWarning()
-    return
-  }
-  const filesToAdd = Array.from(files)
-    .filter(file => file.type.startsWith("image/"))
-    .slice(0, zine.emptySlotsCount)
-
-  filesToAdd.forEach(file => {
-    const img = new Image()
-    const objectURL = URL.createObjectURL(file)
-    img.src = objectURL
-
-    img.onload = function () {
-      const page = new Page(img, zine.nextEmptySlot, layout)
-      zine.slotsList[page.id] = page
-      document.getElementById(`slot-${page.id}`).appendChild(page.container)
-      URL.revokeObjectURL(objectURL)
-    }
-    img.onerror = function () {
-      console.error("Failed to load image")
-      URL.revokeObjectURL(objectURL)
-    }
-  })
-}
-
-function fullSlotsWarning() {
-  console.log("llegaste al límite de imágenes") //may will add something useful here
-}
