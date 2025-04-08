@@ -1,0 +1,237 @@
+:root {
+  --primary-color: #3e4072;
+  --accent-color: #ff6b6b;
+  --bg-color: #fffaf3;
+  --border-color: #ddd;
+  --highlight-color: #ddd4f2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  font-family: sans-serif;
+
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-size: 7rem;
+  font-family: "Arial Black", Impact, sans-serif;
+  font-weight: 900;
+  letter-spacing: -8px;
+  color: var(--accent-color);
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: var(--primary-color);
+}
+
+#dropArea {
+  border: 3px dashed var(--primary-color);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  background-color: white;
+  transition: background-color 0.3s;
+  margin-bottom: 4rem;
+}
+
+#dropArea.dragover {
+  background-color: var(--highlight-color);
+}
+
+#dropArea.disabled {
+  opacity: 0.5;
+}
+
+#uploadBtn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+#uploadBtn:hover {
+  background-color: #e32f2f;
+}
+
+#uploadBtn.disabled {
+  opacity: 0.5;
+}
+
+.operationArea {
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 800px) {
+  .operationArea {
+    flex-direction: column;
+  }
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 800px) {
+  .controls {
+    flex-direction: row;
+  }
+}
+
+.controls button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 0.5rem;
+  background-color: white;
+  color: var(--primary-color);
+  transition: all 0.3s;
+}
+
+.controls button:hover {
+  background-color: var(--highlight-color);
+}
+
+.controls button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+#pagesContainer {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.5rem;
+  justify-items: center;
+  margin-inline: 15%;
+  margin-bottom: 3rem;
+}
+
+.slot {
+  display: flex;
+  flex-direction: row;
+  width: 210px;
+  height: 297px;
+  background-color: white;
+  border: 1px dashed var(--primary-color);
+  border-radius: 0.5rem 0 0.5rem 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slot[data-tool="reorder"]:hover {
+  cursor: url("assets/grab.png"), grab;
+}
+.slot[data-tool="rotate"]:hover {
+  cursor: url("assets/rotate.png"), move;
+}
+.slot[data-tool="move"]:hover {
+  cursor: url("assets/move.png"), move;
+}
+
+.slot[data-tool="scale"]:hover {
+  cursor: url("assets/scale.png"), ne-resize;
+}
+.slot:hover {
+  transform: scale(1.02);
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+}
+
+.tools-container {
+  margin-left: 1px;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.tools-container button {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 0 5px 5px 0;
+  border: 1px solid var(--border-color);
+  border-left: none;
+  padding: 8px;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.tools-container button:hover {
+  background-color: var(--highlight-color);
+}
+.tools-container button:active {
+  transform: scale(1.1);
+}
+.tools-container button img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+#renderBtn {
+  display: block;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  transition: background-color 0.3s;
+}
+
+#renderBtn:hover {
+  background-color: #2d2f5a;
+}
+
+footer {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 4rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+footer a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.sortable-ghost {
+  opacity: 0;
+}

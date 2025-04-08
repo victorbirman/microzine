@@ -1,6 +1,6 @@
 import { SlotList } from "./SlotList.js"
 import { sortable } from "./sortable.js"
-import initializeUploadArea from "./uploadArea.js"
+import dropArea from "./dropArea.js"
 
 export const layout = {
   maxPages: 8,
@@ -18,106 +18,62 @@ const foldingGuides = {
 
 export let zine = new SlotList(layout.maxPages)
 
-initializeUploadArea()
+export const uploader = dropArea()
+uploader.enableDropArea()
 
-//======== Set Current Canvas on Mouseover
-let currentSlot = null
-let currentCanvas
 let slots = document.querySelectorAll(".slot")
+const toolsButtons = document.querySelectorAll(".controls button")
+let activeTool = "reorder"
 
-//======== Transform Tools Rendering and Status
-
-let toolStatus = "reorder"
-
-const statusMapping = {
-  reorderBtn: "reorder",
-  rotateBtn: "rotate",
-  scaleBtn: "scale",
-  moveBtn: "move",
-}
-
-const buttons = document.querySelectorAll(".controls button")
-
-function updateButtonStyles(activeBtnId) {
-  buttons.forEach(btn => {
-    if (btn.id === activeBtnId) {
-      btn.style.color = "blue"
-    } else {
-      btn.style.color = "black"
-    }
-  })
-}
-
-function activateButton(btnId) {
-  toolStatus = statusMapping[btnId]
-  updateButtonStyles(btnId)
-  sortable.options.disabled = true
-}
-
-function activateReorder() {
-  toolStatus = "reorder"
-  updateButtonStyles("reorderBtn")
-  sortable.options.disabled = false
-}
-
-buttons.forEach(btn => {
+toolsButtons.forEach(btn => {
   btn.addEventListener("click", function () {
-    const clickedStatus = statusMapping[btn.id]
-
-    if (clickedStatus === "reorder") {
-      activateReorder()
-      return
-    }
-    if (toolStatus === clickedStatus) {
-      activateReorder()
-      return
-    }
-    activateButton(btn.id)
+    if (btn.id === "reorder" || btn.id === activeTool) {
+      activateTool("reorder")
+    } else activateTool(btn.id)
   })
 })
 
-//========= Active Canvas Status
-slots.forEach(slot =>
-  slot.addEventListener("mouseenter", e => {
-    if (!isDragging) {
-      currentSlot = e.target
-      currentCanvas = zine.slotsList[parseInt(currentSlot.id.replace("slot-", ""))]
-    }
+function activateTool(clickedTool) {
+  activeTool = clickedTool
+  toolsButtons.forEach(btn => {
+    btn.classList.toggle("active", btn.id === activeTool)
   })
-)
-
-slots.forEach(slot =>
-  slot.addEventListener("mouseleave", e => {
-    currentSlot = null
-  })
-)
-
-//====== Mouse Events For Transformation Tools
-
+  sortable.options.disabled = clickedTool !== "reorder"
+  slots.forEach(slot => (slot.dataset.tool = activeTool))
+}
+let currentSlot = null
+let currentCanvas = null
 let isDragging = false
 let lastX, lastY
-
 const rotationFactor = 0.5
 const scaleFactor = 0.01
 
+document.addEventListener("pointerdown", handleMouseDown)
+document.addEventListener("pointermove", handleMouseMove)
+document.addEventListener("pointerup", handleMouseUp)
+
 function handleMouseDown(e) {
-  if (toolStatus === "reorder" || !currentSlot || !currentCanvas) return
+  if (activeTool === "reorder") return
+  currentSlot = e.target.parentElement.parentElement
+  currentCanvas = zine.slotsList[parseInt(currentSlot.id.replace("slot-", ""))]
+
   isDragging = true
   lastX = e.clientX
   lastY = e.clientY
 }
 
 function handleMouseMove(e) {
-  if (!isDragging || !currentCanvas) return
+  if (!isDragging) return
 
   let deltaX = e.clientX - lastX
   let deltaY = e.clientY - lastY
 
-  switch (toolStatus) {
+  switch (activeTool) {
     case "rotate":
       currentCanvas.rotateBy(deltaX * rotationFactor)
       break
     case "scale":
+      console.log(deltaX, scaleFactor)
       currentCanvas.scaleBy(deltaX * scaleFactor)
       break
     case "move":
@@ -129,15 +85,12 @@ function handleMouseMove(e) {
   lastY = e.clientY
 }
 
-function handleMouseUp(e) {
+function handleMouseUp() {
   isDragging = false
+  currentSlot = null
+  currentCanvas = null
 }
 
-document.addEventListener("mousedown", handleMouseDown)
-document.addEventListener("mousemove", handleMouseMove)
-document.addEventListener("mouseup", handleMouseUp)
-
-//========= Render Button
 document.getElementById("renderBtn").addEventListener("click", async () => {
   try {
     const { render } = await import("./render.js")

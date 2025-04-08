@@ -20,6 +20,7 @@ export class Page {
     this.initialHeight = this.image.height / aspectRatio
 
     this.container = document.createElement("div")
+    this.container.className = "container"
     this.container.id = `page-container-${this.id}`
 
     this.createCanvas()
@@ -47,12 +48,12 @@ export class Page {
 
     this.deleteBtn = document.createElement("button")
     this.toolsContainer.appendChild(this.deleteBtn)
-    this.deleteBtn.textContent = "🗑️"
+    this.deleteBtn.innerHTML = `<img src="/assets/delete.svg" alt="Eliminar" class="icon" title="Eliminar imagen"/>`
     this.deleteBtn.addEventListener("click", this.deleteListener)
 
     this.resetBtn = document.createElement("button")
     this.toolsContainer.appendChild(this.resetBtn)
-    this.resetBtn.textContent = "🔄"
+    this.resetBtn.innerHTML = `<img src="/assets/revert.svg" alt="Revertir" class="icon" title="Deshacer cambios"/>`
     this.resetBtn.addEventListener("click", this.resetListener)
   }
 
@@ -67,7 +68,6 @@ export class Page {
     const scaledHeight = this.initialHeight * this.scale
 
     ctx.save()
-    // Translate to canvas center plus any drag offset
     ctx.translate(
       this.canvas.width / 2 + this.offsetX,
       this.canvas.height / 2 + this.offsetY
@@ -89,6 +89,7 @@ export class Page {
   }
 
   scaleBy(deltaScale) {
+    console.log(deltaScale)
     const newScale = this.scale + deltaScale
     this.scale = newScale > 0.1 ? newScale : 0.1
     this.drawImage()

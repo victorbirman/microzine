@@ -1,4 +1,3 @@
-//=========== Initialize Slots
 export class SlotList {
   constructor(numberOfPages) {
     this.slotsList = new Array(numberOfPages).fill(null)

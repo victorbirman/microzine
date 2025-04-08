@@ -116,11 +116,8 @@ function drawFoldingGuides(ctx, outputWidth, outputHeight, foldingGuides) {
 }
 
 function showFinalPage(outputCanvas) {
-  document.body.appendChild(outputCanvas)
-
   const link = document.createElement("a")
   link.href = outputCanvas.toDataURL("image/jpeg", 1.0)
   link.download = "fanzine.jpg"
-  link.textContent = "Descargar fanzine"
-  document.body.appendChild(link)
+  link.click()
 }

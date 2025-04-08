@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Microzine</title>
     <link rel="shortcut icon" href="./assets/favicon.png?v=1" />
-    <link rel="stylesheet" href="style.css?v=1" />
+    <link rel="stylesheet" href="styles.css?v=1" />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="script.js" type="module"></script>
   </head>
@@ -13,10 +13,10 @@
   <body>
     <header>
       <h1>MICRO&#8203;ZINE</h1>
-      <h2>Una app para armar mini fanzines con una sola hoja A4.</h2>
+      <h2>Una app para armar mini fanzines con una hoja A4.</h2>
     </header>
     <div id="dropArea">
-      <p>Arrastrá y soltá acá</p>
+      <p>Arrastrá y soltá tus imágenes acá</p>
       <button id="uploadBtn">Explorar</button>
       <label
         ><input
@@ -27,32 +27,34 @@
           style="display: none"
       /></label>
     </div>
-    <div class="controls">
-      <button id="reorderBtn">Reorder</button>
-      <button id="rotateBtn">Rotate</button>
-      <button id="scaleBtn">Scale</button>
-      <button id="moveBtn">Move</button>
+    <div class="operationArea">
+      <div class="controls">
+        <button class="active" id="reorder">Ordenar</button>
+        <button id="rotate">Girar</button>
+        <button id="scale">Escalar</button>
+        <button id="move">Mover</button>
+      </div>
+      <div id="pagesContainer">
+        <div class="slot" data-tool="reorder" id="slot-0"></div>
+        <div class="slot" data-tool="reorder" id="slot-1"></div>
+        <div class="slot" data-tool="reorder" id="slot-2"></div>
+        <div class="slot" data-tool="reorder" id="slot-3"></div>
+        <div class="slot" data-tool="reorder" id="slot-4"></div>
+        <div class="slot" data-tool="reorder" id="slot-5"></div>
+        <div class="slot" data-tool="reorder" id="slot-6"></div>
+        <div class="slot" data-tool="reorder" id="slot-7"></div>
+      </div>
     </div>
-    <div id="pagesContainer">
-      <div class="slot" id="slot-0"></div>
-      <div class="slot" id="slot-1"></div>
-      <div class="slot" id="slot-2"></div>
-      <div class="slot" id="slot-3"></div>
-      <div class="slot" id="slot-4"></div>
-      <div class="slot" id="slot-5"></div>
-      <div class="slot" id="slot-6"></div>
-      <div class="slot" id="slot-7"></div>
-    </div>
-    <button id="renderBtn">render</button>
+    <button id="renderBtn">Descargar fanzine</button>
     <footer>
-      <p>
+      <!-- <p>
         El código fuente de esta página web se encuentra bajo la licencia
         <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank"
           >GNU General Public License v3.0 (GPLv3)</a
         >. Por otro lado, las ilustraciones y obras visuales presentes son propiedad
         de sus autores originales y no están incluidas en los términos de la licencia
         GPLv3.
-      </p>
+      </p> -->
       <!-- <a
         class="cafecito"
         href="https://cafecito.app/birman"
