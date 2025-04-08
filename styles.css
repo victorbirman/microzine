@@ -127,7 +127,7 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 1.5rem;
   justify-items: center;
-  margin-inline: 15%;
+  margin-inline: 5%;
   margin-bottom: 3rem;
 }
 
