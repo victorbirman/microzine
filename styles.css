@@ -19,7 +19,6 @@ body {
   font-family: sans-serif;
 
   padding: 2rem;
-  line-height: 1.6;
 }
 
 header {
@@ -28,11 +27,12 @@ header {
 }
 
 h1 {
-  font-size: 7rem;
+  font-size: 6rem;
   font-family: "Arial Black", Impact, sans-serif;
   font-weight: 900;
-  letter-spacing: -8px;
-  color: var(--accent-color);
+  line-height: 6rem;
+  letter-spacing: -0.6rem;
+  margin-bottom: 2rem;
 }
 
 h2 {
@@ -80,17 +80,18 @@ h2 {
 
 .operationArea {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  max-width: 95%;
 }
 
 @media (max-width: 800px) {
   .operationArea {
-    flex-direction: column;
+    flex-direction: row;
   }
 }
 .controls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   gap: 1rem;
   margin-bottom: 2rem;
@@ -98,7 +99,8 @@ h2 {
 
 @media (max-width: 800px) {
   .controls {
-    flex-direction: row;
+    flex-direction: column;
+    justify-content: flex-start;
   }
 }
 
@@ -124,7 +126,7 @@ h2 {
 #pagesContainer {
   flex-grow: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
   gap: 1.5rem;
   justify-items: center;
   margin-inline: 5%;
@@ -163,6 +165,7 @@ canvas {
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
 }
 
 .container {
