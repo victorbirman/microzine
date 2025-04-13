@@ -17,13 +17,11 @@ body {
   background-color: var(--bg-color);
   color: var(--primary-color);
   font-family: sans-serif;
-
   padding: 2rem;
 }
 
 header {
   text-align: center;
-  margin-bottom: 2rem;
 }
 
 h1 {
@@ -37,6 +35,7 @@ h1 {
 
 h2 {
   font-size: 1.25rem;
+  margin-bottom: 1em;
   font-weight: 300;
   color: var(--primary-color);
 }
@@ -48,7 +47,8 @@ h2 {
   text-align: center;
   background-color: white;
   transition: background-color 0.3s;
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
+  margin-inline: auto;
 }
 
 #dropArea.dragover {
@@ -67,13 +67,18 @@ h2 {
   background-color: var(--accent-color);
   color: white;
   border-radius: 0.5rem;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 #uploadBtn:hover {
   background-color: #e32f2f;
 }
 
+#uploadBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #d12b2b;
+}
 #uploadBtn.disabled {
   opacity: 0.5;
 }
@@ -82,15 +87,21 @@ h2 {
   display: flex;
   flex-direction: column;
   max-width: 95%;
+  margin-inline: auto;
 }
 
 @media (max-width: 800px) {
   .operationArea {
     flex-direction: row;
+    align-items: flex-start;
+  }
+  body {
+    padding: 0.7rem;
   }
 }
 .controls {
   display: flex;
+
   flex-direction: row;
   justify-content: center;
   gap: 1rem;
@@ -101,6 +112,8 @@ h2 {
   .controls {
     flex-direction: column;
     justify-content: flex-start;
+    top: 30svh;
+    position: sticky;
   }
 }
 
@@ -129,7 +142,6 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
   gap: 1.5rem;
   justify-items: center;
-  margin-inline: 5%;
   margin-bottom: 3rem;
 }
 
@@ -202,8 +214,20 @@ canvas {
   display: block;
 }
 
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.render-container {
+  display: flex;
+  justify-content: center;
+}
 #renderBtn {
-  display: block;
+  position: relative; /* clave para el spinner */
   margin: 0 auto;
   padding: 1rem 2rem;
   font-size: 1.2rem;
@@ -212,10 +236,53 @@ canvas {
   border: none;
   border-radius: 1rem;
   transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* espacio entre texto y spinner */
 }
 
 #renderBtn:hover {
   background-color: #2d2f5a;
+}
+
+#renderBtn:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background-color: #23254a;
+}
+
+.spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.checkmark {
+  color: #32cd32; /* verde lima, podés ajustar */
+  font-size: 1.2em;
+  animation: fadeIn 0.3s ease-in-out;
+  margin-left: 0.5rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 footer {

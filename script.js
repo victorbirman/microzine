@@ -1,6 +1,7 @@
 import { SlotList } from "./SlotList.js"
 import { sortable } from "./sortable.js"
 import dropArea from "./dropArea.js"
+import render from "./render.js"
 
 export const layout = {
   maxPages: 8,
@@ -26,21 +27,36 @@ const toolsButtons = document.querySelectorAll(".controls button")
 let activeTool = "reorder"
 
 toolsButtons.forEach(btn => {
-  btn.addEventListener("click", function () {
-    if (btn.id === "reorder" || btn.id === activeTool) {
-      activateTool("reorder")
-    } else activateTool(btn.id)
-  })
+  btn.addEventListener("click", () => activateTool(selectedTool(btn.id)))
 })
 
-function activateTool(clickedTool) {
-  activeTool = clickedTool
+function selectedTool(clickedTool) {
+  return clickedTool === "reorder" || clickedTool === activeTool
+    ? "reorder"
+    : clickedTool
+}
+
+function activateTool(tool) {
+  activeTool = tool
   toolsButtons.forEach(btn => {
     btn.classList.toggle("active", btn.id === activeTool)
   })
-  sortable.options.disabled = clickedTool !== "reorder"
+  sortable.options.disabled = tool !== "reorder"
   slots.forEach(slot => (slot.dataset.tool = activeTool))
 }
+
+const keyMap = {
+  o: "reorder",
+  m: "move",
+  g: "rotate",
+  e: "scale",
+}
+
+document.addEventListener("keydown", e => {
+  const tool = keyMap[e.key.toLowerCase()]
+  if (tool) activateTool(selectedTool(tool))
+})
+
 let currentSlot = null
 let currentCanvas = null
 let isDragging = false
@@ -73,7 +89,6 @@ function handleMouseMove(e) {
       currentCanvas.rotateBy(deltaX * rotationFactor)
       break
     case "scale":
-      console.log(deltaX, scaleFactor)
       currentCanvas.scaleBy(deltaX * scaleFactor)
       break
     case "move":
@@ -92,10 +107,42 @@ function handleMouseUp() {
 }
 
 document.getElementById("renderBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("renderBtn")
+  const label = btn.querySelector(".btn-label")
+  const spinner = btn.querySelector(".spinner")
+  const checkmark = btn.querySelector(".checkmark")
+
+  btn.disabled = true
+  label.textContent = "Generando..."
+  spinner.hidden = false
+  checkmark.hidden = true
+
+  // Esperar dos frames para asegurar repintado visual
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+
   try {
-    const { render } = await import("./render.js")
-    render(zine.slotsList, layout.pagesOrder, foldingGuides)
+    const canvas = await render(zine.slotsList, layout.pagesOrder, foldingGuides)
+    if (canvas) {
+      showFinalPage(canvas)
+      checkmark.hidden = false
+    }
   } catch (error) {
-    console.error("Error importing or calling render:", error)
+    console.error("Error calling render:", error)
+    alert("Hubo un error generando el fanzine.")
+  } finally {
+    label.textContent = "Descargar fanzine"
+    spinner.hidden = true
+    btn.disabled = false
+    spinner.hidden = true
+    setTimeout(() => {
+      checkmark.hidden = true
+    }, 3000)
   }
 })
+
+function showFinalPage(outputCanvas) {
+  const link = document.createElement("a")
+  link.href = outputCanvas.toDataURL("image/jpeg", 1.0)
+  link.download = "fanzine.jpg"
+  link.click()
+}

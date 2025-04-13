@@ -16,7 +16,7 @@
       <h2>Una app para armar mini fanzines con una hoja A4.</h2>
     </header>
     <div id="dropArea">
-      <p>Arrastrá y soltá tus imágenes acá</p>
+      <p>Cargá hasta 8 imágenes o arrastralas acá</p>
       <button id="uploadBtn">Explorar</button>
       <label
         ><input
@@ -29,10 +29,12 @@
     </div>
     <div class="operationArea">
       <div class="controls">
-        <button class="active" id="reorder">Ordenar</button>
-        <button id="rotate">Girar</button>
-        <button id="scale">Escalar</button>
-        <button id="move">Mover</button>
+        <button class="active" id="reorder">
+          <span class="underline">O</span>rdenar
+        </button>
+        <button id="rotate"><span class="underline">G</span>irar</button>
+        <button id="scale"><span class="underline">E</span>scalar</button>
+        <button id="move"><span class="underline">M</span>over</button>
       </div>
       <div id="pagesContainer">
         <div class="slot" data-tool="reorder" id="slot-0"></div>
@@ -45,7 +47,13 @@
         <div class="slot" data-tool="reorder" id="slot-7"></div>
       </div>
     </div>
-    <button id="renderBtn">Descargar fanzine</button>
+    <div class="render-container">
+      <button id="renderBtn">
+        <span class="btn-label">Descargar fanzine</span>
+        <span class="spinner" hidden></span>
+        <span class="checkmark" hidden>✔</span>
+      </button>
+    </div>
     <footer>
       <!-- <p>
         El código fuente de esta página web se encuentra bajo la licencia

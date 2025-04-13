@@ -1,6 +1,5 @@
 import { Page } from "./Page.js"
 import { zine, layout } from "./script.js"
-//import { uploader } from "./script.js"
 
 export default function dropArea() {
   const dropArea = document.getElementById("dropArea")

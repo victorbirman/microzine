@@ -1,4 +1,4 @@
-export function render(pages, finalOrder, foldingGuides) {
+export default function render(pages, finalOrder, foldingGuides) {
   const firstColumnOrder = [7, 0, 1, 2]
   const secondColumnOrder = [3, 4, 5, 6]
 
@@ -66,7 +66,7 @@ export function render(pages, finalOrder, foldingGuides) {
 
   drawFoldingGuides(ctx, outputCanvas.width, outputCanvas.height, foldingGuides)
 
-  showFinalPage(outputCanvas)
+  return outputCanvas
 }
 
 function drawColumn(ctx, canvas, posX, posY, rotationAngle, pageWidth, pageHeight) {
@@ -113,11 +113,4 @@ function drawFoldingGuides(ctx, outputWidth, outputHeight, foldingGuides) {
     ctx.stroke()
   }
   ctx.restore()
-}
-
-function showFinalPage(outputCanvas) {
-  const link = document.createElement("a")
-  link.href = outputCanvas.toDataURL("image/jpeg", 1.0)
-  link.download = "fanzine.jpg"
-  link.click()
 }
