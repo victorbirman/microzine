@@ -118,7 +118,7 @@ h2 {
   }
 }
 
-.underline {
+.controls button::first-letter {
   text-decoration: underline;
 }
 

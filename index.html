@@ -4,6 +4,63 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Microzine</title>
+    <meta
+      name="description"
+      content="Diseña e imprime fanzines en una sola hoja de papel. Design and print your own micro-fanzines on a single A4 page. Upload up to 8 images, arrange and export as a foldable booklet."
+    />
+    <meta
+      name="keywords"
+      content="fanzine, zine, mini-zine, microzine, printable booklet,  A4 zine,imprimir zine,   diseño de fanzines, DIY zine maker, create zines online"
+    />
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="Microzine – Crea mini fanzines en una sola hoja A4"
+    />
+    <meta
+      property="og:description"
+      content="Subí tus imágenes y creá un fanzine imprimible. Una herramienta simple para diseñar tu propio fanzine en papel."
+    />
+    <meta
+      property="og:image"
+      content="https://microzine.com.ar/assets/preview.jpg"
+    />
+    <meta property="og:url" content="https://microzine.com.ar" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Microzine – Crea mini fanzines imprimibles"
+    />
+    <meta
+      name="twitter:description"
+      content="Subí tus imágenes y creá un fanzine
+    imprimible. Una herramienta simple para diseñar tu propio fanzine en papel."
+    />
+    <meta
+      name="twitter:image"
+      content="https://microzine.com.ar/assets/preview.jpg"
+    />
+
+    <!-- Datos estructurados (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Microzine",
+        "url": "https://microzine.com.ar",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "All",
+        "description": "A web app to create printable mini-zines on a single A4 sheet. Upload, arrange and export as a foldable fanzine.",
+        "inLanguage": ["es", "en"]
+      }
+    </script>
+
+    <meta name="author" content="Victor Birman" />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="Content-Language" content="es,en" />
     <link rel="shortcut icon" href="./assets/favicon.png?v=1" />
     <link rel="stylesheet" href="styles.css?v=1" />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -33,12 +90,10 @@
     </div>
     <div class="operationArea">
       <div class="controls">
-        <button class="active" id="reorder">
-          <span class="underline">O</span>rdenar
-        </button>
-        <button id="rotate"><span class="underline">G</span>irar</button>
-        <button id="scale"><span class="underline">E</span>scalar</button>
-        <button id="move"><span class="underline">M</span>over</button>
+        <button class="active" id="reorder">Ordenar</button>
+        <button id="rotate">Girar</button>
+        <button id="scale">Escalar</button>
+        <button id="move">Mover</button>
       </div>
       <div id="pagesContainer">
         <div class="slot" data-tool="reorder" id="slot-0"></div>
@@ -59,14 +114,6 @@
       </button>
     </div>
     <footer>
-      <!-- <p>
-        El código fuente de esta página web se encuentra bajo la licencia
-        <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank"
-          >GNU General Public License v3.0 (GPLv3)</a
-        >. Por otro lado, las ilustraciones y obras visuales presentes son propiedad
-        de sus autores originales y no están incluidas en los términos de la licencia
-        GPLv3.
-      </p> -->
       <!-- <a
         class="cafecito"
         href="https://cafecito.app/birman"
