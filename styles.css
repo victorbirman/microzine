@@ -94,6 +94,7 @@ h2 {
   .operationArea {
     flex-direction: row;
     align-items: flex-start;
+    margin-inline: 0;
   }
   body {
     padding: 0.7rem;
@@ -115,6 +116,10 @@ h2 {
     top: 30svh;
     position: sticky;
   }
+}
+
+.underline {
+  text-decoration: underline;
 }
 
 .controls button {
